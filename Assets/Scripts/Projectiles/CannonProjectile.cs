@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class CannonProjectile : Projectile
 {
-
     public override void Initialize(params object[] args)
     {
         base.Initialize();
@@ -13,5 +13,5 @@ public class CannonProjectile : Projectile
         }
     }
 
-    protected override void Move() {    }
+    protected override void Move() { }
 }

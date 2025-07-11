@@ -3,17 +3,21 @@ using System.Collections.Generic;
 
 public class ProjectilePool : MonoBehaviour, IProjectileProvider
 {
-    [SerializeField] private GameObject projectilePrefab;
+    [SerializeField] private GameObject projectilePrefab = null;
+    [SerializeField] private Transform poolContainer;
     [SerializeField] private int initialPoolSize = 20;
 
     private Queue<GameObject> pool;
 
     private void Awake()
     {
+        if (poolContainer == null)
+            poolContainer = new GameObject(projectilePrefab.name + "PoolContainer").transform;
+
         pool = new Queue<GameObject>(initialPoolSize);
         for (int i = 0; i < initialPoolSize; i++)
         {
-            var obj = Instantiate(projectilePrefab, transform);
+            var obj = Instantiate(projectilePrefab, poolContainer);
             obj.SetActive(false);
             pool.Enqueue(obj);
         }
@@ -25,7 +29,9 @@ public class ProjectilePool : MonoBehaviour, IProjectileProvider
         if (pool.Count > 0)
             proj = pool.Dequeue();
         else
-            proj = Instantiate(projectilePrefab, transform);
+            proj = Instantiate(projectilePrefab);
+
+        proj.transform.SetParent(poolContainer, worldPositionStays: true);
 
         proj.transform.position = position;
         proj.transform.rotation = rotation;

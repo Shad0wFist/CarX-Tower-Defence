@@ -3,8 +3,8 @@ using System.Collections;
 
 public class Spawner : MonoBehaviour
 {
-    [SerializeField] private Monster monsterPrefab;
-    [SerializeField] private Transform moveTarget;
+    [SerializeField] private Monster monsterPrefab = null;
+    [SerializeField] private Transform moveTarget = null;
     [SerializeField] private float spawnInterval = 3f;
     [SerializeField] private int initialPoolSize = 20;
 

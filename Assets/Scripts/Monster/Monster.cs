@@ -1,50 +1,38 @@
 ﻿using UnityEngine;
-[RequireComponent(typeof(MonsterMovement))]
-public class Monster : MonoBehaviour, IDamageable, IMoveTargetProvider
+
+[RequireComponent(typeof(MonsterMovement), typeof(Health))]
+public class Monster : MonoBehaviour, IMoveTargetProvider
 {
-	[SerializeField] int maxHP = 30;
-	int currentHP;
+    [SerializeField] private Transform moveTarget;
+    public Transform Target => moveTarget;
 
-	[SerializeField] private Transform moveTarget;
-	public Transform Target => moveTarget;
+    private MonsterMovement movement;
+    private Health health;
+    private ObjectPool<Monster> pool;
 
-	private MonsterMovement movement;
-	private ObjectPool<Monster> pool;
-
-	void Awake()
-	{
-		movement = GetComponent<MonsterMovement>();
-		movement.ReachedTarget += HandleReachedTarget;
-	}
-
-	private void OnEnable()
+    private void Awake()
     {
-        currentHP = maxHP;
+        movement = GetComponent<MonsterMovement>();
+        health = GetComponent<Health>();
+
+        movement.ReachedTarget += HandleReachedTarget;
+        health.OnDied += HandleDeath;
     }
 
-	public void Initialize(ObjectPool<Monster> sourcePool, Transform target)
+    public void Initialize(ObjectPool<Monster> sourcePool, Transform target)
     {
         pool = sourcePool;
         moveTarget = target;
     }
 
-    public void ApplyDamage(int damage)
+    private void HandleReachedTarget()
     {
-        currentHP -= damage;
-        if (currentHP <= 0)
-            Die();
+        health.ApplyDamage(health.CurrentHP);
     }
 
-	void HandleReachedTarget()
-	{
-		Die();
-	}
-
-	void Die()
-	{
-		if (pool != null)
-            pool.Release(this);
-        else
-            Destroy(gameObject);
-	}
+    private void HandleDeath()
+    {
+        if (pool != null) pool.Release(this);
+        else Destroy(gameObject);
+    }
 }

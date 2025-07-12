@@ -41,5 +41,8 @@ public class Spawner : MonoBehaviour
         Monster m = monsterPool.Get();
         m.transform.position = transform.position;
         m.Initialize(monsterPool, moveTarget);
+        var hb = m.GetComponentInChildren<HealthBarController>();
+        var health = m.GetComponent<Health>();
+        hb.Bind(health);
     }
 }

@@ -49,7 +49,7 @@ public abstract class Projectile : MonoBehaviour, IPoolableProjectile
     public virtual void Release()
     {
         // Reset all forces
-        rb.velocity = Vector3.zero;
+        rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         rb.Sleep();
         rb.isKinematic = true;

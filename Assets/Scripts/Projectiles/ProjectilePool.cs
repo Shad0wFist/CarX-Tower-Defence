@@ -3,11 +3,14 @@ using System.Collections.Generic;
 
 public class ProjectilePool : MonoBehaviour, IProjectileProvider
 {
-    [SerializeField] private GameObject projectilePrefab = null;
+    [SerializeField] private GameObject projectilePrefab;
     [SerializeField] private Transform poolContainer;
     [SerializeField] private int initialPoolSize = 20;
 
     private Queue<GameObject> pool;
+
+    private float projectileMass = 0f;
+    public float ProjectileMass => projectileMass;
 
     private void Awake()
     {
@@ -21,9 +24,15 @@ public class ProjectilePool : MonoBehaviour, IProjectileProvider
             obj.SetActive(false);
             pool.Enqueue(obj);
         }
+        projectileMass = projectilePrefab.GetComponent<Rigidbody>().mass;
     }
 
-    public void SpawnProjectile(Vector3 position, Quaternion rotation, Transform target = null, float initialForce = 0f)
+    public void SpawnProjectile(
+        Vector3 position,
+        Quaternion rotation,
+        Transform target = null,
+        float initialForce = 0f,
+        bool usePhysics = false)
     {
         GameObject proj;
         if (pool.Count > 0)
@@ -43,7 +52,7 @@ public class ProjectilePool : MonoBehaviour, IProjectileProvider
 
         var cannon = proj.GetComponent<CannonProjectile>();
         if (cannon != null)
-            cannon.Initialize(initialForce);
+            cannon.Initialize(initialForce, usePhysics);
 
         var releaser = proj.GetComponent<IPoolableProjectile>();
         if (releaser != null)

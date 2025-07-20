@@ -28,7 +28,7 @@ public class GuidedProjectile : Projectile
 		}
 
 		Vector3 desiredVelocity = (target.position - transform.position).normalized * speed;
-		Vector3 steering = desiredVelocity - rb.velocity;
+		Vector3 steering = desiredVelocity - rb.linearVelocity;
 		
 		if (steering.magnitude > maxSteeringForce)
 			steering = steering.normalized * maxSteeringForce;

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(ITargetSelector), typeof(IProjectileProvider))]
@@ -10,21 +11,27 @@ public abstract class Tower : MonoBehaviour
     private float lastShotTime = 0f;
     protected ITargetSelector targetSelector;
     protected IProjectileProvider projectileProvider;
+    protected Transform target;
 
     protected virtual void Awake()
     {
         targetSelector = GetComponent<ITargetSelector>();
         projectileProvider = GetComponent<IProjectileProvider>();
-        lastShotTime = -shootInterval;
+        lastShotTime = Time.time;
     }
 
     protected virtual void Update()
     {
-        if (Time.time < lastShotTime + shootInterval)
+        target = targetSelector.SelectTarget(transform.position, range);
+        if (target == null)
             return;
 
-        Transform target = targetSelector.SelectTarget(transform.position, range);
-        if (target == null)
+        // If tower has IShootCondition, listen to it
+        var condition = GetComponent<IShootCondition>();
+        if (condition != null && !condition.CanShoot())
+            return;
+        
+        if (Time.time < lastShotTime + shootInterval)
             return;
 
         Shoot(target);

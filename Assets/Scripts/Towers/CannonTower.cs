@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 public enum TargetingMode { Direct, Ballistic }
 
-[RequireComponent(typeof(NearestMonsterSelector))]
 [RequireComponent(typeof(ProjectilePool))]
 [RequireComponent(typeof(CannonRotator))]
 [RequireComponent(typeof(TargetVelocityTracker))]
@@ -81,13 +80,12 @@ public class CannonTower : Tower
             aimStrategy = new BallisticAimStrategy(speed);
     }
 
-	protected override void Shoot(Transform target)
+	protected override void Shoot()
 	{
 		bool usePhysics = targetingMode == TargetingMode.Ballistic;
 		projectileProvider.SpawnProjectile(
 			shootPoint.position,
 			shootPoint.rotation,
-			target,
 			launchForce,
 			usePhysics);
 	}

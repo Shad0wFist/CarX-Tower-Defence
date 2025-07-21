@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine;
 
-[RequireComponent(typeof(ITargetSelector), typeof(IProjectileProvider))]
+[RequireComponent(typeof(IProjectileProvider))]
 public abstract class Tower : MonoBehaviour
 {
     [SerializeField] protected float shootInterval = 1f;
@@ -15,7 +15,7 @@ public abstract class Tower : MonoBehaviour
 
     protected virtual void Awake()
     {
-        targetSelector = GetComponent<ITargetSelector>();
+        targetSelector = NearestMonsterSelector.Instance;
         projectileProvider = GetComponent<IProjectileProvider>();
         lastShotTime = Time.time;
     }
@@ -34,9 +34,9 @@ public abstract class Tower : MonoBehaviour
         if (Time.time < lastShotTime + shootInterval)
             return;
 
-        Shoot(target);
+        Shoot();
         lastShotTime = Time.time;
     }
 
-    protected abstract void Shoot(Transform target);
+    protected abstract void Shoot();
 }

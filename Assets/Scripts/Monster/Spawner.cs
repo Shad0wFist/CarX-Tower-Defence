@@ -14,6 +14,11 @@ public class Spawner : MonoBehaviour
     private void Awake()
     {
         monsterPool = new ObjectPool<Monster>(monsterPrefab, initialPoolSize);
+
+        if (NearestMonsterSelector.Instance != null)
+        {
+            NearestMonsterSelector.Instance.Initialize(monsterPool);
+        }
     }
 
     private void OnEnable()

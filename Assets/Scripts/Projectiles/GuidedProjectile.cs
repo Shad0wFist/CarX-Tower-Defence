@@ -5,14 +5,18 @@ public class GuidedProjectile : Projectile
 	[SerializeField] private float maxSteeringForce = 30f;
 	[SerializeField] private float findingRange = 20f;
 	private Transform target;
-	private ITargetSelector selector;
+	private ITargetSelector targetSelector;
 
-	// args: [0] Transform initialTarget, [1] ITargetSelector selector
+	protected override void Awake()
+	{
+		base.Awake();
+		targetSelector = NearestMonsterSelector.Instance;
+	}
+
 	public override void Initialize(params object[] args)
 	{
 		base.Initialize();
-        target = args.Length > 0 ? args[0] as Transform : null;
-        selector = args.Length > 1 ? args[1] as ITargetSelector : null;
+		target = targetSelector.SelectTarget(transform.position, findingRange);
 	}
 
 	protected override void Move()
@@ -20,7 +24,7 @@ public class GuidedProjectile : Projectile
 		// Find new target
 		if (target == null || !target.gameObject.activeInHierarchy)
 		{
-			target = selector.SelectTarget(transform.position, findingRange);
+			target = targetSelector.SelectTarget(transform.position, findingRange);
 			if (target == null)
 			{
 				return;

@@ -7,6 +7,8 @@ public class ObjectPool<T> where T : Component
     private readonly T prefab;
     private readonly Queue<T> objects = new Queue<T>();
     private readonly Transform parentContainer;
+    private readonly List<T> objectsOnScene = new List<T>();
+    public IEnumerable<T> ActiveObjects => objectsOnScene;
 
     public ObjectPool(T prefab, int initialSize = 10)
     {
@@ -15,7 +17,7 @@ public class ObjectPool<T> where T : Component
 
         for (int i = 0; i < initialSize; i++)
         {
-            T obj = GameObject.Instantiate(prefab, parentContainer);
+            T obj = Object.Instantiate(prefab, parentContainer);
             obj.gameObject.SetActive(false);
             objects.Enqueue(obj);
         }
@@ -25,18 +27,20 @@ public class ObjectPool<T> where T : Component
     {
         if (objects.Count == 0)
         {
-            T obj = GameObject.Instantiate(prefab, parentContainer);
+            T obj = Object.Instantiate(prefab, parentContainer);
             objects.Enqueue(obj);
         }
 
         T spawned = objects.Dequeue();
         spawned.gameObject.SetActive(true);
+        objectsOnScene.Add(spawned);
         return spawned;
     }
 
     public void Release(T toRelease)
     {
         toRelease.gameObject.SetActive(false);
+        objectsOnScene.Remove(toRelease);
         objects.Enqueue(toRelease);
     }
 }

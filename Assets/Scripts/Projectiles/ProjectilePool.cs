@@ -30,7 +30,6 @@ public class ProjectilePool : MonoBehaviour, IProjectileProvider
     public void SpawnProjectile(
         Vector3 position,
         Quaternion rotation,
-        Transform target = null,
         float initialForce = 0f,
         bool usePhysics = false)
     {
@@ -48,7 +47,7 @@ public class ProjectilePool : MonoBehaviour, IProjectileProvider
 
         var guided = proj.GetComponent<GuidedProjectile>();
         if (guided != null)
-            guided.Initialize(target, GetComponent<ITargetSelector>());
+            guided.Initialize();
 
         var cannon = proj.GetComponent<CannonProjectile>();
         if (cannon != null)

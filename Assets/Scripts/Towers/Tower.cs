@@ -13,11 +13,15 @@ public abstract class Tower : MonoBehaviour
     protected IProjectileProvider projectileProvider;
     protected Transform target;
 
-    protected virtual void Awake()
+    private void Awake()
     {
-        targetSelector = NearestMonsterSelector.Instance;
-        projectileProvider = GetComponent<IProjectileProvider>();
         lastShotTime = Time.time;
+        projectileProvider = GetComponent<IProjectileProvider>();
+    }
+    protected virtual void Start()
+    {
+        lastShotTime = Time.time - shootInterval;
+        targetSelector = NearestMonsterSelector.Instance;
     }
 
     protected virtual void Update()
@@ -30,7 +34,7 @@ public abstract class Tower : MonoBehaviour
         var condition = GetComponent<IShootCondition>();
         if (condition != null && !condition.CanShoot())
             return;
-        
+
         if (Time.time < lastShotTime + shootInterval)
             return;
 
@@ -39,4 +43,30 @@ public abstract class Tower : MonoBehaviour
     }
 
     protected abstract void Shoot();
+    
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.cyan;
+        Vector3 center = transform.position;
+
+        // 3 rings:
+        DrawRings(center, Vector3.right, Vector3.up);    // XY
+        DrawRings(center, Vector3.right, Vector3.forward); // XZ
+        DrawRings(center, Vector3.forward, Vector3.up);  // YZ
+    }
+
+    private void DrawRings(Vector3 center, Vector3 axis1, Vector3 axis2, int segments = 64)
+    {
+        float angleStep = 2 * Mathf.PI / segments;
+        Vector3 prevPoint = center + (axis1.normalized * range);
+        for (int i = 1; i <= segments; i++)
+        {
+            float angle = i * angleStep;
+            Vector3 newPoint = center
+                + axis1.normalized * Mathf.Cos(angle) * range
+                + axis2.normalized * Mathf.Sin(angle) * range;
+            Gizmos.DrawLine(prevPoint, newPoint);
+            prevPoint = newPoint;
+        }
+    }
 }

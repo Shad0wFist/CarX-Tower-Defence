@@ -23,9 +23,9 @@ public abstract class Projectile : MonoBehaviour, IPoolableProjectile
         rb.isKinematic = false;
     }
 
-    protected virtual void Update()
+    protected virtual void FixedUpdate()
     {
-        lifeTimer -= Time.deltaTime;
+        lifeTimer -= Time.fixedDeltaTime;
         if (lifeTimer <= 0f)
         {
             Release();

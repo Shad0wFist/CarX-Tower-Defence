@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 [RequireComponent(typeof(Camera))]
-public class FreeFlyCamera : MonoBehaviour
+public class FlyingCamera : MonoBehaviour
 {
     #region UI
 
@@ -73,6 +73,17 @@ public class FreeFlyCamera : MonoBehaviour
     [Tooltip("This keypress will move the camera to initialization position")]
     private KeyCode _initPositonButton = KeyCode.R;
 
+    [SerializeField]
+    [Tooltip("Bounds for flying camera")]
+    private CameraBounds cameraBounds;
+
+    [SerializeField,
+    Tooltip("Minimum tilt angle (in degrees)")] 
+    private float minPitch = -85f;
+    [SerializeField,
+    Tooltip("Maximum tilt angle (in degrees)")] 
+    private float maxPitch = 85f;
+
     #endregion UI
 
     private CursorLockMode _wantedMode;
@@ -83,6 +94,10 @@ public class FreeFlyCamera : MonoBehaviour
     private Vector3 _initPosition;
     private Vector3 _initRotation;
 
+    
+    private float yaw;
+    private float pitch;
+
 #if UNITY_EDITOR
     private void OnValidate()
     {
@@ -91,7 +106,12 @@ public class FreeFlyCamera : MonoBehaviour
     }
 #endif
 
-
+    private void Awake()
+    {
+        Vector3 e = transform.eulerAngles;
+        yaw = e.y;
+        pitch = e.x;
+    }
     private void Start()
     {
         _initPosition = transform.position;
@@ -185,22 +205,18 @@ public class FreeFlyCamera : MonoBehaviour
 
             transform.position += deltaPosition * currentSpeed * _currentIncrease;
         }
-
+        
         // Rotation
         if (_enableRotation)
         {
-            // Pitch
-            transform.rotation *= Quaternion.AngleAxis(
-                -Input.GetAxis("Mouse Y") * _mouseSense,
-                Vector3.right
-            );
+            float mouseX = Input.GetAxis("Mouse X") * _mouseSense;
+            float mouseY = Input.GetAxis("Mouse Y") * _mouseSense;
 
-            // Paw
-            transform.rotation = Quaternion.Euler(
-                transform.eulerAngles.x,
-                transform.eulerAngles.y + Input.GetAxis("Mouse X") * _mouseSense,
-                transform.eulerAngles.z
-            );
+            yaw += mouseX;
+            pitch -= mouseY;
+            pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
+
+            transform.rotation = Quaternion.Euler(pitch, yaw, 0f);
         }
 
         // Return to init position
@@ -209,5 +225,11 @@ public class FreeFlyCamera : MonoBehaviour
             transform.position = _initPosition;
             transform.eulerAngles = _initRotation;
         }
+    }
+
+    private void LateUpdate()
+    {
+        if (cameraBounds != null)
+            transform.position = cameraBounds.ClampToBounds(transform.position);
     }
 }

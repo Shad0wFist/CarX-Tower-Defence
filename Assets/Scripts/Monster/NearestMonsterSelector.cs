@@ -16,15 +16,27 @@ public class NearestMonsterSelector : MonoBehaviour, ITargetSelector
         Instance = this;
     }
 
+    private void OnEnable()
+    {
+        Spawner.OnPoolCreated += Initialize;
+    }
+
+    private void OnDisable()
+    {
+        Spawner.OnPoolCreated -= Initialize;
+    }
+
     public void Initialize(ObjectPool<Monster> pool)
     {
         monsterPool = pool;
+        
     }
 
     public Transform SelectTarget(Vector3 origin, float range)
     {
         if (monsterPool == null)
         {
+            Debug.Log("monsterPool == null");
             return null;
         }
 

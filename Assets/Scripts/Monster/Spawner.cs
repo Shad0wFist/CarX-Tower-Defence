@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public class Spawner : MonoBehaviour
 {
+    public static event Action<ObjectPool<Monster>> OnPoolCreated;
     [SerializeField] private Monster monsterPrefab = null;
     [SerializeField] private Transform moveTarget = null;
     [SerializeField] private float spawnInterval = 3f;
@@ -14,16 +16,16 @@ public class Spawner : MonoBehaviour
     private void Awake()
     {
         monsterPool = new ObjectPool<Monster>(monsterPrefab, initialPoolSize);
-
-        if (NearestMonsterSelector.Instance != null)
-        {
-            NearestMonsterSelector.Instance.Initialize(monsterPool);
-        }
     }
 
     private void OnEnable()
     {
         spawnRoutine = StartCoroutine(SpawnLoop());
+    }
+
+    private void Start()
+    {
+        OnPoolCreated?.Invoke(monsterPool);
     }
 
     private void OnDisable()

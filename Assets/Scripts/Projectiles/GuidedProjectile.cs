@@ -10,12 +10,16 @@ public class GuidedProjectile : Projectile
 	protected override void Awake()
 	{
 		base.Awake();
-		targetSelector = NearestMonsterSelector.Instance;
 	}
 
-	public override void Initialize(params object[] args)
+    public override void Initialize(params object[] args)
 	{
 		base.Initialize();
+		targetSelector = NearestMonsterSelector.Instance;
+		if (targetSelector == null)
+		{
+			Debug.Log("adfcwjnbhikllilwdajlnkbhlhjnkdaw");
+		}
 		target = targetSelector.SelectTarget(transform.position, findingRange);
 	}
 

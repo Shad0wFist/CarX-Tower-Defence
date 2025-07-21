@@ -21,16 +21,12 @@ public class CannonTower : Tower
 	private TargetVelocityTracker velocityTracker;
     private TargetingMode lastMode;
 
-	protected override void Awake()
+	protected override void Start()
 	{
-		base.Awake();
+		base.Start();
 		rotator = GetComponent<CannonRotator>();
 		aimStrategy = GetComponent<IAimStrategy>();
 		velocityTracker = GetComponent<TargetVelocityTracker>();
-	}
-
-	void Start()
-	{
 		projectileMass = projectileProvider.ProjectileMass;
 		SetupAimStrategy();
         lastMode = targetingMode;

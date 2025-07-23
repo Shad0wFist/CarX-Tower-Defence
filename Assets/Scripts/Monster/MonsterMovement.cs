@@ -19,7 +19,7 @@ public class MonsterMovement : MonoBehaviour
 
     void Update()
     {
-        moveTarget = provider.Target;      // получаем цель каждый кадр
+        moveTarget = provider.Target;
         if (moveTarget == null)
             return;
 

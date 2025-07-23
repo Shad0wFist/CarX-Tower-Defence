@@ -15,7 +15,6 @@ public class DirectAimStrategy : IAimStrategy
         float distance = toTarget.magnitude;
         float timeToTarget = distance / projectileSpeed;
 
-        // Итеративное уточнение
         for (int i = 0; i < 3; i++)
         {
             Vector3 predictedPosition = targetPosition + targetVelocity * timeToTarget;

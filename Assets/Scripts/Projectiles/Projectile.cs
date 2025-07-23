@@ -5,6 +5,7 @@ public abstract class Projectile : MonoBehaviour, IPoolableProjectile
 {
     [SerializeField] protected int damage = 10;
     [SerializeField] protected float maxLifeTime = 5f;
+    [SerializeField] protected LayerMask damageableLayers;
     private float lifeTimer;
 
     protected Rigidbody rb;
@@ -38,8 +39,10 @@ public abstract class Projectile : MonoBehaviour, IPoolableProjectile
 
     protected virtual void OnTriggerEnter(Collider other)
     {
-        var dmg = other.GetComponentInParent<IDamageable>();
-        if (dmg != null)
+        if (((1 << other.gameObject.layer) & damageableLayers.value) == 0)
+            return;
+
+        if (other.TryGetComponent<IDamageable>(out var dmg))
         {
             dmg.ApplyDamage(damage);
             Release();

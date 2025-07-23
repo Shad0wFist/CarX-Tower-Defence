@@ -15,6 +15,19 @@ public class CannonRotator : MonoBehaviour
     private bool isAimed = false;
     public bool IsAimed() => isAimed;
 
+    public float RotationSpeed
+    {
+        get => rotationSpeed;
+        set => rotationSpeed = Mathf.Max(0f, value);
+    }
+
+    public float ElevationSpeed
+    {
+        get => elevationSpeed;
+        set => elevationSpeed = Mathf.Max(0f, value);
+    }
+
+
     public void SetAimDirection(Vector3 direction)
     {
         desiredDirection = direction.normalized;
@@ -25,7 +38,7 @@ public class CannonRotator : MonoBehaviour
     {
         if (isAimed) return;
 
-        // Rotate the base along Y
+        // Rotate the base
         Vector3 desiredHorizontal = new Vector3(desiredDirection.x, 0, desiredDirection.z).normalized;
         Quaternion targetBase = Quaternion.LookRotation(desiredHorizontal);
         baseTransform.rotation = Quaternion.RotateTowards(

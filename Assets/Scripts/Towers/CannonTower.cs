@@ -10,8 +10,6 @@ public class CannonTower : Tower
 	[SerializeField] private Transform shootPoint = null;
 	[SerializeField] private float launchForce = 20f;
 	[SerializeField] private TargetingMode targetingMode = TargetingMode.Direct;
-	[SerializeField] private float aimUpdateInterval = 0.3f;
-	private float lastAimUpdateTime = 0f;
 
 	public float LaunchForce => launchForce;
 	private float projectileMass = 0f;
@@ -19,7 +17,25 @@ public class CannonTower : Tower
 	private CannonRotator rotator;
 	private IAimStrategy aimStrategy;
 	private TargetVelocityTracker velocityTracker;
-    private TargetingMode lastMode;
+	private TargetingMode lastMode;
+	private Transform lastTrackedTarget;
+
+	public float ShootInterval
+	{
+		get => shootInterval;
+		set => shootInterval = Mathf.Max(0f, value);
+	}
+
+	public TargetingMode TargetingMode
+	{
+		get => targetingMode;
+		set
+		{
+			if (targetingMode == value) return;
+			targetingMode = value;
+			SetupAimStrategy();
+		}
+	}
 
 	protected override void Start()
 	{
@@ -29,13 +45,13 @@ public class CannonTower : Tower
 		velocityTracker = GetComponent<TargetVelocityTracker>();
 		projectileMass = projectileProvider.ProjectileMass;
 		SetupAimStrategy();
-        lastMode = targetingMode;
+		lastMode = targetingMode;
 	}
 
 	protected override void Update()
 	{
 		base.Update();
-		
+
 		if (targetingMode != lastMode)
 		{
 			SetupAimStrategy();
@@ -45,14 +61,17 @@ public class CannonTower : Tower
 		if (target == null)
 		{
 			rotator.ResetAim();
+			lastTrackedTarget = null;
 			return;
 		}
 
-		if (Time.time >= lastAimUpdateTime + aimUpdateInterval)
+		if (target != lastTrackedTarget)
 		{
-			lastAimUpdateTime = Time.time;
+			lastTrackedTarget = target;
 			velocityTracker.Initialize(target);
-		};
+			rotator.ResetAim();
+			return;
+		}
 
 		Vector3 targetPos = target.position;
 		Vector3 targetVel = velocityTracker.CurrentVelocity;
@@ -68,13 +87,13 @@ public class CannonTower : Tower
 	}
 
 	private void SetupAimStrategy()
-    {
-        float speed = launchForce / projectileMass;
-        if (targetingMode == TargetingMode.Direct)
-            aimStrategy = new DirectAimStrategy(speed);
-        else
-            aimStrategy = new BallisticAimStrategy(speed);
-    }
+	{
+		float speed = launchForce / projectileMass;
+		if (targetingMode == TargetingMode.Direct)
+			aimStrategy = new DirectAimStrategy(speed);
+		else
+			aimStrategy = new BallisticAimStrategy(speed);
+	}
 
 	protected override void Shoot()
 	{
